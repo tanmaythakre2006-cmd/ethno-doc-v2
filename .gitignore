@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+local_vault/*.sqlite
+local_vault/*.jsonl
