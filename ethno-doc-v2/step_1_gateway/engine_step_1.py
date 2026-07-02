@@ -3,6 +3,7 @@ import os
 import asyncio
 import sqlite3
 import pathlib
+import opencc
 
 from step_1_gateway.schemas import ChronologicalToken
 from step_1_gateway.wikidata_client import WikidataSPARQLClient
@@ -13,6 +14,10 @@ class CorpusScanner:
     Scans a local text corpus for exact substring matches of historical character tokens.
     """
     def __init__(self):
+        # Initialize variant conversion engines
+        self.s2t = opencc.OpenCC('s2t')
+        self.t2s = opencc.OpenCC('t2s')
+
         # Dynamically compute the path to the local text corpus directory
         current_file_path = pathlib.Path(__file__).resolve()
         self.tcm_texts_dir = current_file_path.parent.parent / "local_vault" / "tcm_texts"
@@ -40,18 +45,33 @@ class CorpusScanner:
                 except Exception as e:
                     print(f"Failed to read corpus file {file_path}: {e}")
 
+    def _get_character_variants(self, raw_token: str) -> set[str]:
+        """
+        Takes a raw token string and generates a deduplicated set
+        of its Simplified and Traditional Chinese character variants.
+        """
+        return {
+            raw_token,
+            self.s2t.convert(raw_token),
+            self.t2s.convert(raw_token)
+        }
+
     def scan(self, token: ChronologicalToken) -> ChronologicalToken:
         """
-        Performs an exact substring search across loaded texts.
+        Performs an exact substring search across loaded texts using multi-variant lookahead.
         Returns a new token instance with updated verification status.
         """
-        match_count = sum(
-            token.historical_character in text
-            for text in self.corpus_texts
-        )
+        variants = self._get_character_variants(token.historical_character)
 
-        if match_count > 0:
-            return token.model_copy(update={'is_verified_in_corpus': True})
+        for variant in variants:
+            match_count = sum(
+                variant in text
+                for text in self.corpus_texts
+            )
+
+            if match_count > 0:
+                return token.model_copy(update={'is_verified_in_corpus': True})
+
         return token
 
 
