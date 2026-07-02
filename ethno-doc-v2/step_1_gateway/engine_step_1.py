@@ -4,6 +4,7 @@ import asyncio
 import sqlite3
 import pathlib
 import opencc
+import re
 
 from step_1_gateway.schemas import ChronologicalToken
 from step_1_gateway.wikidata_client import WikidataSPARQLClient
@@ -40,8 +41,12 @@ class CorpusScanner:
         for file_path in self.tcm_texts_dir.glob("*.txt"):
             if file_path.is_file():
                 try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        self.corpus_texts.append(f.read())
+                    # PATCHED: Encoding Crash Prevention
+                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                        raw_text = f.read()
+                        # PATCHED: Whitespace Compression Matrix
+                        compressed_text = re.sub(r'\s+', '', raw_text)
+                        self.corpus_texts.append(compressed_text)
                 except Exception as e:
                     print(f"Failed to read corpus file {file_path}: {e}")
 
@@ -65,8 +70,9 @@ class CorpusScanner:
 
         for variant in variants:
             match_count = sum(
-                variant in text
-                for text in self.corpus_texts
+                # PATCHED: Whitespace Compression Matrix (search against compressed_text)
+                variant in compressed_text
+                for compressed_text in self.corpus_texts
             )
 
             if match_count > 0:
