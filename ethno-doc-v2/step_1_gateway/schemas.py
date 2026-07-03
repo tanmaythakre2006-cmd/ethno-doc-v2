@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import BaseModel, Field, field_validator, ConfigDict, model_validator
 
 class ChronologicalToken(BaseModel):
     """
@@ -24,6 +24,18 @@ class ChronologicalToken(BaseModel):
         default=False,
         description='Tracks whether the token passed the forward-pass lookahead filter in the local text corpus.'
     )
+    # PATCHED: Single-Character Risk Mitigation
+    is_single_character_risk: bool = Field(
+        default=False,
+        description="Flags if the historical alias is highly generic (1 character long)"
+    )
+
+    # PATCHED: Single-Character Risk Mitigation
+    @model_validator(mode='after')
+    def check_single_character_risk(self):
+        if len(self.historical_character) == 1:
+            object.__setattr__(self, 'is_single_character_risk', True)
+        return self
 
     @field_validator('generic_english_name')
     @classmethod
