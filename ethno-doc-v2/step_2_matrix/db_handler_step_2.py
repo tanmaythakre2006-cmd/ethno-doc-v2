@@ -30,6 +30,7 @@ def initialize_database():
         chapter_metadata TEXT NOT NULL,
         extracted_context TEXT NOT NULL,
         context_hash TEXT NOT NULL UNIQUE,
+        confidence_score INTEGER NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """
