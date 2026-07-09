@@ -51,12 +51,17 @@ def main():
     conn2 = sqlite3.connect(str(step2_db_path), isolation_level=None)
     conn2.execute("BEGIN TRANSACTION;")
 
+    # PATCHED: Batch Committing (RAM Flush) (engine_step_2.py)
+    batch_count = 0
+
     for filepath in tcm_texts_dir.glob("*.txt"):
         total_text_files_processed += 1
         filename = filepath.name
         score = get_confidence_score(filename)
 
         extractor = ContextExtractor()
+        # PATCHED: The Metadata State Wipe (engine_step_2.py)
+        extractor.current_chapter = "Metadata Unspecified"
 
         with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
             for line in f:
@@ -112,7 +117,14 @@ def main():
                                 else:
                                     successful_sqlite_insertions += 1
 
-    conn2.execute("COMMIT;")
+                                    # PATCHED: Batch Committing (RAM Flush) (engine_step_2.py)
+                                    batch_count += 1
+                                    if batch_count % 1000 == 0:
+                                        conn2.commit()
+                                        conn2.execute("BEGIN TRANSACTION;")
+
+    # PATCHED: Batch Committing (RAM Flush) (engine_step_2.py)
+    conn2.commit()
     conn2.close()
 
     os.system('cls' if os.name == 'nt' else 'clear')

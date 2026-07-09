@@ -46,29 +46,38 @@ class ContextExtractor:
             could be extracted if the target_token appears in multiple separate
             locations within the text block that do not share the same context boundary.
         """
-        # Split text into sentences using Chinese terminal punctuation as delimiters
-        # We use re.split with a capture group so we can reconstruct or just split by the delimiters
-        # Alternatively, we just split by delimiters and ignore keeping them for simplicity
-        # based on the prompt "joins these captured sentences back together with periods (。)."
+        # PATCHED: Classical CJK Punctuation Parsing (segmenter.py)
+        raw_parts = re.split(r'([。！？\n；，、]+)', text_block)
 
-        raw_sentences = re.split(r'[。！？\n]', text_block)
-        # Filter out empty strings
-        sentences = [s.strip() for s in raw_sentences if s.strip()]
+        sentences = []
+        for i in range(0, len(raw_parts) - 1, 2):
+            sentences.append(raw_parts[i] + raw_parts[i+1])
+        if len(raw_parts) % 2 == 1 and raw_parts[-1]:
+            sentences.append(raw_parts[-1])
+
+        sentences = [s.strip() for s in sentences if s.strip()]
 
         extracted_contexts = []
 
-        # Keep track of indices already included in a previous extraction to avoid duplication
-        # if the token appears in consecutive sentences. But strictly following the prompt:
-        # iterate, find token, capture i-1, i, i+1, i+2.
+        # PATCHED: Index Memory Deduplication (segmenter.py)
+        captured_indices = set()
 
-        # We will iterate and whenever we find the token, we grab the slice.
         for i, sentence in enumerate(sentences):
-            if target_token in sentence:
+            # PATCHED: The Ghost Token Fix (segmenter.py)
+            compressed_sentence = re.sub(r'\s+', '', sentence)
+
+            if i in captured_indices:
+                continue
+
+            if target_token in compressed_sentence:
                 start_idx = max(0, i - 1)
                 end_idx = min(len(sentences), i + 3) # i+3 because slice is exclusive
 
                 captured = sentences[start_idx:end_idx]
-                context_str = "。".join(captured) + "。"
+                context_str = "".join(captured)
+
+                for idx in range(start_idx, end_idx):
+                    captured_indices.add(idx)
 
                 # Check if we should add it (could use a simple deduplication if desired,
                 # but the hashing step later will handle true duplicates in DB anyway)
