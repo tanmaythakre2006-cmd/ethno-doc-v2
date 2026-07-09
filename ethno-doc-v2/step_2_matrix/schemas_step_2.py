@@ -14,3 +14,4 @@ class ExtractedClaim(BaseModel):
     chapter_metadata: str = Field(..., description="The nearest preceding chapter heading")
     extracted_context: str = Field(..., description="The raw text paragraph containing the token and its surrounding sentences")
     context_hash: str = Field(..., description="A SHA-256 cryptographic hash of extracted_context + taxon_id")
+    confidence_score: int = Field(..., description="The confidence score of the source book")
