@@ -1,0 +1,210 @@
+/* CYBERNETIC STYLING */
+:root {
+    --bg-color: #0b0c10;
+    --panel-bg: #1f2833;
+    --text-color: #c5c6c7;
+    --neon-cyan: #66fcf1;
+    --dark-cyan: #45a29e;
+    --neon-amber: #ffb800;
+    --font-main: 'Courier New', Courier, monospace;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-main);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 25%;
+    min-width: 250px;
+    max-width: 350px;
+    background-color: var(--panel-bg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--dark-cyan);
+    z-index: 10;
+}
+
+.sidebar h2 {
+    color: var(--neon-cyan);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    text-shadow: 0 0 5px var(--neon-cyan);
+}
+
+.search-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+input[type="text"] {
+    padding: 10px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--dark-cyan);
+    color: var(--neon-cyan);
+    font-family: var(--font-main);
+    outline: none;
+}
+
+input[type="text"]:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 5px var(--neon-cyan);
+}
+
+button {
+    padding: 10px;
+    background-color: var(--dark-cyan);
+    color: var(--bg-color);
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--neon-cyan);
+    box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+.filters h3 {
+    color: var(--neon-amber);
+    margin-bottom: 10px;
+}
+
+/* Network Graph Panel */
+.main-content {
+    flex-grow: 1;
+    position: relative;
+    background-color: var(--bg-color);
+    overflow: hidden;
+}
+
+#network-graph {
+    width: 100%;
+    height: 100%;
+}
+
+/* Right Panel (3D Viewer) */
+.right-panel {
+    width: 30%;
+    min-width: 300px;
+    max-width: 450px;
+    background-color: var(--panel-bg);
+    border-left: 1px solid var(--dark-cyan);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+}
+
+#mol-viewer-container {
+    width: 100%;
+    height: 60%;
+    border-bottom: 1px solid var(--dark-cyan);
+    position: relative;
+    background-color: #000;
+}
+
+#mol-viewer {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.mol-info {
+    padding: 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.mol-info h3 {
+    color: var(--neon-amber);
+    margin-bottom: 10px;
+}
+
+/* Loading Overlay */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(11, 12, 16, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+#loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#loading-overlay h2 {
+    color: var(--neon-cyan);
+    margin-top: 20px;
+    animation: pulse 1.5s infinite;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--dark-cyan);
+    border-top: 5px solid var(--neon-cyan);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* D3 SVG Styles */
+.node {
+    stroke: #fff;
+    stroke-width: 1.5px;
+    cursor: pointer;
+}
+.link {
+    stroke: #999;
+    stroke-opacity: 0.6;
+}
+.node-label {
+    fill: var(--text-color);
+    font-size: 10px;
+    pointer-events: none;
+    text-shadow: 0 0 3px #000;
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethno-Doc-V2 Dashboard</title>
+
+    <!-- CDNs -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.0.4/3Dmol-min.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <h2>Waking compute clusters...</h2>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Panel 1: Search/Filter Sidebar -->
+        <aside class="sidebar">
+            <h2>Ethno-Doc-V2</h2>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Query Species / Syndromes...">
+                <button id="search-btn">Search</button>
+            </div>
+            <div class="filters">
+                <h3>Filters</h3>
+                <!-- Placeholder for dynamic filters -->
+                <label><input type="checkbox" id="filter-verified" checked> Verified Targets Only</label>
+            </div>
+        </aside>
+
+        <!-- Panel 2: Central Canvas Container for D3.js Graph -->
+        <main class="main-content">
+            <div id="network-graph"></div>
+        </main>
+
+        <!-- Panel 3: Right-side Floating Panel for 3Dmol.js Macromolecular Rendering -->
+        <aside class="right-panel">
+            <div id="mol-viewer-container">
+                <div id="mol-viewer"></div>
+            </div>
+            <div class="mol-info">
+                <h3 id="mol-title">Macromolecule Data</h3>
+                <p id="mol-stats">Select a chemical node to render</p>
+            </div>
+        </aside>
+    </div>
+
+    <!-- JS Modules -->
+    <script src="js/ping.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/prune.js"></script>
+    <script src="js/graph.js"></script>
+</body>
+</html>
