@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  backend:
+    image: python:3.11-slim
+    container_name: ethno_doc_backend
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - ../backend:/app
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - ethno_doc_net
+
+  redis:
+    image: redis:alpine
+    container_name: ethno_doc_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - ethno_doc_net
+
+  db:
+    image: postgres:15
+    container_name: ethno_doc_db
+    environment:
+      POSTGRES_USER: ethno_doc
+      POSTGRES_PASSWORD: ethno_doc
+      POSTGRES_DB: ethno_doc
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - ethno_doc_net
+
+networks:
+  ethno_doc_net:
+    driver: bridge
+
+volumes:
+  pgdata:
