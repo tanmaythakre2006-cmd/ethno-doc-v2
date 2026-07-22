@@ -5,7 +5,7 @@ import random
 import logging
 from typing import Optional
 
-from .schemas_step_3 import TaxonomicProfile
+from step_3_taxonomy.schemas_step_3 import TaxonomicProfile
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class GBIFResolver:
         self.headers = {
             "User-Agent": "EthnoDocBot/2.0 (mailto:infrastructure-admin@ethnodoc.internal)"
         }
-        self.timeout = httpx.Timeout(20.0)
+        self.timeout = httpx.Timeout(5.0, connect=15.0, read=30.0)
 
     async def resolve_species(self, english_name: str, context_hash: str) -> Optional[TaxonomicProfile]:
         params = {
